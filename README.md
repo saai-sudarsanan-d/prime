@@ -9,39 +9,33 @@
 ## Args
 - prime
   - create
-    - task-name
+    - task_name
     - deadline (timeleft)
         ```
-          Should be of the form tx
+          Can be of the form t-x
             - x is the unit of time in consideration. [can be w,d,m,h or s]
             - t is the number of units of the x specified.
-
             Example :
-              2w - 2 Weeks
-              5d - 5 Days
-              3h - 3 Hours
-              10m - 10 Minutes
-              15s - 15 Seconds
+              2-w -> 2 Weeks | 5-d -> 5 Days | 3-h -> 3 Hours | 10-m -> 10 Minutes | 15-s -> 15 Seconds
+
+          Or a date of the format -> yyyy-mm-dd
         ```
-    - priority (default 0) (can be 0,1 or 2)
+    - priority (default 0) (can be 0,1,2 or 3)
   
   - read
     - (default - show all tasks (sort by deadlines))
     - filter
-      - task-name
+      - task_name
       - deadline
       - priority
       - count (show only top $count number of tasks)
 
   - update (user can select from read mode/enter task-name)
     - identifier (task-name)
-      - task-name
-      - deadline
-      - priority
-    - new value
+    - new task_name
+    - new deadline
+    - new priority
   - delete
+    - task_name
     - done (default true)
     - archive (default true)
-
-## Other Utilities
-- notify using desktop notifications
