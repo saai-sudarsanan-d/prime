@@ -1,13 +1,21 @@
 use clap::Parser;
-use prime::args::{PrimeArgs,Mode};
-use prime::handler::{createhandler,readhandler,updatehandler,deletehandler};
+use prime::args::{Mode, PrimeArgs};
+use prime::handler::{createhandler, deletehandler, readhandler, updatehandler};
 
-fn main(){
+fn main() {
     let opts = PrimeArgs::parse();
     match opts.command {
-        Mode::Create(args) => {createhandler::handle(args);},
-        Mode::Read(args) => {readhandler::handle(args);},
-        Mode::Update(args) => {updatehandler::handle(args);},
-        Mode::Delete(args) => {deletehandler::handle(args);}
+        Mode::Create(args) => {
+            createhandler::handle(args).unwrap();
+        }
+        Mode::Read(args) => {
+            readhandler::handle(args);
+        }
+        Mode::Update(args) => {
+            updatehandler::handle(args).unwrap();
+        }
+        Mode::Delete(args) => {
+            deletehandler::handle(args);
+        }
     }
 }

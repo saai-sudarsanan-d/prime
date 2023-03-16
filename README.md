@@ -2,7 +2,7 @@
 
 ## Config
   - $PRIME_ROOT Root Directory of all your task directories
-  - $PRIME_COMPLETED Directory to putt all your completed tasks (default $PRIME_ROOT/completed)
+  - $PRIME_COMPLETED Directory to put all your completed tasks (default $PRIME_ROOT/completed)
 
 ## Logical Objects
 
@@ -37,5 +37,5 @@
     - new priority
   - delete
     - task_name
-    - done (default true)
+    - done (default false)
     - archive (default true)

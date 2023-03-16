@@ -1,34 +1,23 @@
-use crate::{args::CreateArgs, validation::validate_priority,parser::parsedeadline};
-use serde::{Serialize,Deserialize};
-use std::fs::{DirBuilder,write};
+use crate::task::{getroot, writetask};
+use crate::{args::CreateArgs, parser::parsedeadline, validation::validate_priority};
+use std::io::{Error, ErrorKind};
 use std::path::Path;
-use std::env;
 
-#[derive(Serialize,Deserialize)]
-struct NewTask{
-    title: String,
-    deadline: String,
-    priority: u8
-}
+pub fn handle(args: CreateArgs) -> Result<(), Error> {
+    let priority = validate_priority(args.priority).expect("Invalid Priority");
+    let deadline = parsedeadline(&args.deadline)
+        .expect("Invalid Deadline")
+        .to_string();
 
-pub fn handle(args: CreateArgs){
-    let root = env::var("PRIME_ROOT").expect("PRIME_ROOT is not set!");
-    if !Path::new(&root).is_dir() {
-        DirBuilder::new()
-        .create(&root)
-        .expect("PRIME_ROOT Directory does not exist and could not be created!");
+    // Creating a Task
+    let root = getroot();
+    let filename = format!("{}/{}.yaml", &root, &args.task_name);
+    if Path::new(&filename).is_file() {
+        return Err(Error::new(
+            ErrorKind::Other,
+            "Task with same name already exists",
+        ));
     }
-    let filename = format!("{}/{}.yaml",&root,args.task_name);
-    if Path::new(&filename).is_file(){
-        panic!("Please try a different task name");
-    }
-    write(
-        filename,
-        serde_yaml
-        ::to_string(&NewTask{
-            title:args.task_name,
-            deadline:parsedeadline(&args.deadline).expect("Invalid Deadline").to_string(),
-            priority:validate_priority(args.priority).expect("Invalid Priority")
-        }).expect("Serde YAML Error"))
-        .expect("Task could not be created");
+    writetask(&args.task_name, &deadline, priority);
+    Ok(())
 }
