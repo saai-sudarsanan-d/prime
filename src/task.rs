@@ -24,8 +24,14 @@ pub fn checkandcreateroot() {
     }
 }
 
-// pub fn readtask(task_name: &str){
-// }
+pub fn taskexists(task_name: &str) -> bool{
+    let root = getroot();
+    let filename = format!("{}/{}.yaml",&root,task_name);
+    if Path::new(&filename).is_file() {
+        return true;
+    }
+    return false;
+}
 
 pub fn writetask(task_name: &str, deadline: &str, priority: u8) {
     let root = getroot();

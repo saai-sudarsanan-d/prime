@@ -15,7 +15,7 @@ fn main() {
             updatehandler::handle(args).unwrap();
         }
         Mode::Delete(args) => {
-            deletehandler::handle(args);
+            deletehandler::handle(args).unwrap();
         }
     }
 }

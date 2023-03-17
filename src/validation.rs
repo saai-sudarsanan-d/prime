@@ -1,4 +1,6 @@
 use std::io::{Error, ErrorKind};
+use crate::task::getroot;
+use std::path::Path;
 
 use regex::Regex;
 pub fn validate_deadline(deadline: &str) -> Result<&str, Error> {
@@ -25,4 +27,16 @@ pub fn validate_priority(priority: u8) -> Result<u8, Error> {
             "Priority must be greater than equal to 0 and less than 4!",
         ))
     }
+}
+
+pub fn validate_title(task_name: &str) -> Result<&str, Error> {
+    let root = getroot();
+    let filename = format!("{}/{}.yaml", root, task_name);
+    if Path::new(&filename).is_file() {
+        return Err(Error::new(
+            ErrorKind::Other,
+            "Task with same name already exists",
+        ));
+    }
+    Ok(task_name)
 }

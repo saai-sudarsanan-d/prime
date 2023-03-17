@@ -100,6 +100,6 @@ pub struct DeleteArgs {
     #[arg(long="done",short='k',value_name="DONE?",action=ArgAction::SetTrue)]
     pub done: bool,
     /// Do you want to archive this task?
-    #[arg(long="archive",short='a',value_name="ARCHIVE?",action=ArgAction::SetFalse)]
+    #[arg(long="dont_archive",short='x',value_name="ARCHIVE?",action=ArgAction::SetFalse)]
     pub archive: bool,
 }
