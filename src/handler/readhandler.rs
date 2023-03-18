@@ -1,48 +1,28 @@
-use crate::{args::ReadArgs, task::{Task,getroot}, parser::parsedeadline,validation::has_spl_chars};
-use chrono::{DateTime,Local};
-use glob::glob;
-use std::fs;
+use crate::{
+    args::ReadArgs,
+    parser::parsedeadline,
+    task::{getroot, Task},
+    validation::has_spl_chars,
+};
+use chrono::{DateTime, Local};
 use colored::Colorize;
+use glob::glob;
 use regex::Regex;
+use std::fs;
+use std::io::Error;
 use std::process;
 
-pub fn handle(args: ReadArgs){
-    let root= getroot();
-    let entries:Vec<_> = match glob(&format!("{}/*.yaml",&root)){
-                Ok(r) => r,
-                Err(e) => {
-                    eprintln!("{}",e);
-                    process::exit(1);
-                }
-            }.collect();
+pub fn handle(args: ReadArgs) -> Result<(), Error> {
+    let root = getroot();
+    let entries: Vec<_> = glob(&format!("{}/*.yaml", &root)).unwrap().collect();
     let mut count = 0;
-    for entry in entries{ 
-        let filename = 
-        match 
-            match entry {
-                Ok(r) => r,
-                Err(e) => {
-                    eprintln!("{}",e);
-                    process::exit(1);
-                }
-            }.to_str() 
-        {
-            Some(r) => r,
-            None => continue
-        }.to_owned();
-
-        let task_contents = match fs::read_to_string(&filename) {
+    for entry in entries {
+        let filename = entry.unwrap().to_str().unwrap().to_owned();
+        let task_contents = fs::read_to_string(&filename)?;
+        let task: Task = match serde_yaml::from_str(&task_contents) {
             Ok(r) => r,
             Err(e) => {
-                eprintln!("{}",e);
-                process::exit(1);
-            }
-        };
-        
-        let task:Task = match serde_yaml::from_str(&task_contents) {
-            Ok(r) => r,
-            Err(e) => {
-                eprintln!("{}",e);
+                eprintln!("{}", e);
                 process::exit(1);
             }
         };
@@ -52,78 +32,75 @@ pub fn handle(args: ReadArgs){
         let mut pshow = false;
 
         // title check
-        match &args.task_name { 
+        match &args.task_name {
             Some(q) => {
-                if has_spl_chars(&q){
-                    eprintln!("{}",String::from("query string cannot contain special characters").red());
+                if has_spl_chars(&q) {
+                    eprintln!(
+                        "{}",
+                        String::from("query string cannot contain special characters").red()
+                    );
                     process::exit(1);
                 }
-
-                let query = match Regex::new(&format!(r"{}",q)){
+                let query = match Regex::new(&format!(r"{}", q)) {
                     Ok(r) => r,
                     Err(e) => {
-                        eprintln!("{}",e);
+                        eprintln!("{}", e);
                         process::exit(1);
                     }
                 };
-                
                 if query.is_match(&task.title) {
-                    tshow = true;                
+                    tshow = true;
                 }
-            },
-            None => {tshow = true;}
-            
+            }
+            None => {
+                tshow = true;
+            }
         }
-        
+
         // deadline check
-        match &args.deadline { 
+        match &args.deadline {
             Some(d) => {
-                let dl = match parsedeadline(d){
-                    Ok(r) => r,
-                    Err(e) => {
-                        eprintln!("{}",e);
-                        process::exit(1);
-                    }
-                };
+                let dl = parsedeadline(d)?;
                 if match task.deadline.parse::<DateTime<Local>>() {
                     Ok(r) => r,
                     Err(e) => {
-                        eprintln!("{}",e);
+                        eprintln!("{}", e);
                         process::exit(1);
                     }
-                } < dl {
+                } < dl
+                {
                     dshow = true;
-                }            
-            },
-            None => {dshow = true;}
-            
+                }
+            }
+            None => {
+                dshow = true;
+            }
         }
 
         // priority check
-        match args.priority { 
+        match args.priority {
             Some(p) => {
-                if task.priority == p{
+                if task.priority == p {
                     pshow = true;
                 }
-            },
-            None => {pshow = true;}
-            
+            }
+            None => {
+                pshow = true;
+            }
         }
 
         // count check
         if tshow && pshow && dshow {
             count += 1;
             if count > args.count {
-                break
+                break;
             }
         }
         if tshow && pshow && dshow {
-            println!("{}",task.title.red().bold());
-            println!("{}",task.priority.to_string().blue());
-            println!("{}",task.deadline.green());
+            println!("{}", task.title.red().bold());
+            println!("{}", task.priority.to_string().blue());
+            println!("{}", task.deadline.green());
         }
     }
+    Ok(())
 }
-
-// Let's Get Rusty
-// Rust Lang Book

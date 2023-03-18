@@ -1,11 +1,11 @@
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs::{write, DirBuilder};
 use std::path::Path;
 use std::process;
-use colored::Colorize;
 
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
     pub title: String,
     pub deadline: String,
@@ -28,21 +28,27 @@ pub fn getroot() -> String {
 pub fn checkandcreateroot() {
     let root = getroot();
     if !Path::new(&root).is_dir() {
-        match DirBuilder::new()
-            .create(&root) {
-                Ok(r) => r,
-                Err(e) => {
-                    eprintln!("Error: {}\n{}",e,
-                                String::from("The $PRIME_ROOT Directory was not found and could not be created!").blue().bold());
-                    process::exit(1);
-                }
-            };
+        match DirBuilder::new().create(&root) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!(
+                    "Error: {}\n{}",
+                    e,
+                    String::from(
+                        "The $PRIME_ROOT Directory was not found and could not be created!"
+                    )
+                    .blue()
+                    .bold()
+                );
+                process::exit(1);
+            }
+        };
     }
 }
 
-pub fn taskexists(task_name: &str) -> bool{
+pub fn taskexists(task_name: &str) -> bool {
     let root = getroot();
-    let filename = format!("{}/{}.yaml",&root,task_name);
+    let filename = format!("{}/{}.yaml", &root, task_name);
     if Path::new(&filename).is_file() {
         return true;
     }
@@ -55,19 +61,29 @@ pub fn writetask(task_name: String, deadline: String, priority: u8) {
     let filename = format!("{}/{}.yaml", &root, task_name);
     match write(
         filename,
-        match serde_yaml::to_string(&Task {title: task_name.to_owned(),deadline: deadline.to_owned(),priority}) {
+        match serde_yaml::to_string(&Task {
+            title: task_name.to_owned(),
+            deadline: deadline.to_owned(),
+            priority,
+        }) {
             Ok(s) => s,
             Err(e) => {
-                eprintln!("Error: {}\n{}",e,
-                            String::from("Serde couldn't parse the task").blue().bold());
+                eprintln!(
+                    "Error: {}\n{}",
+                    e,
+                    String::from("Serde couldn't parse the task").blue().bold()
+                );
                 process::exit(1);
             }
-        }
-    ){
+        },
+    ) {
         Ok(_) => (),
         Err(e) => {
-            eprintln!("Error: {}\n{}",e,
-                        String::from("The task could not be created!").blue().bold());
+            eprintln!(
+                "Error: {}\n{}",
+                e,
+                String::from("The task could not be created!").blue().bold()
+            );
             process::exit(1);
         }
     };
