@@ -20,7 +20,7 @@ pub fn handle(args: UpdateArgs) -> Result<(),Error> {
             None => println!("no new name specified")
         }
         
-        let nd:Option<String> = match &args.new_deadline {
+        let nd:Option<String> = match args.new_deadline {
             Some(d) => {
                 let nd = parsedeadline(&d).expect("Invalid Deadline").to_string();
                 Some(nd)
@@ -28,7 +28,7 @@ pub fn handle(args: UpdateArgs) -> Result<(),Error> {
             None => None
         };
         
-        match &nd {
+        match nd {
             Some(d) => {
                 println!("Changing deadline {} to {}",task.deadline,d);
                 task.deadline = d;

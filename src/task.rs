@@ -4,9 +4,9 @@ use std::fs::{write, DirBuilder};
 use std::path::Path;
 
 #[derive(Serialize, Deserialize,Debug)]
-pub struct Task<'a> {
-    pub title: &'a str,
-    pub deadline: &'a str,
+pub struct Task {
+    pub title: String,
+    pub deadline: String,
     pub priority: u8,
 }
 
@@ -33,15 +33,15 @@ pub fn taskexists(task_name: &str) -> bool{
     return false;
 }
 
-pub fn writetask(task_name: &str, deadline: &str, priority: u8) {
+pub fn writetask(task_name: String, deadline: String, priority: u8) {
     let root = getroot();
     checkandcreateroot();
     let filename = format!("{}/{}.yaml", &root, task_name);
     write(
         filename,
         serde_yaml::to_string(&Task {
-            title: task_name,
-            deadline,
+            title: task_name.to_owned(),
+            deadline: deadline.to_owned(),
             priority,
         })
         .expect("Serde YAML Error"),

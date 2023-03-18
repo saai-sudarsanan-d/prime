@@ -8,7 +8,6 @@ pub fn handle(args: CreateArgs) -> Result<(), Error> {
         .expect("Invalid Deadline")
         .to_string();
     let task_name = validate_title(&args.task_name).expect("Invalid Task Name");
-    writetask(&task_name, &deadline, priority);
-    // Ok(String::from("Task Created"))
+    writetask(task_name, deadline, priority);
     Ok(())
 }

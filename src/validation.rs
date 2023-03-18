@@ -29,7 +29,7 @@ pub fn validate_priority(priority: u8) -> Result<u8, Error> {
     }
 }
 
-pub fn validate_title(task_name: &str) -> Result<&str, Error> {
+pub fn validate_title(task_name: &str) -> Result<String, Error> {
     let root = getroot();
     let filename = format!("{}/{}.yaml", root, task_name);
     if Path::new(&filename).is_file() {
@@ -38,5 +38,5 @@ pub fn validate_title(task_name: &str) -> Result<&str, Error> {
             "Task with same name already exists",
         ));
     }
-    Ok(task_name)
+    Ok(String::from(task_name))
 }
