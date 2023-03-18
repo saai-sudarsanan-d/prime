@@ -29,6 +29,15 @@ pub fn validate_priority(priority: u8) -> Result<u8, Error> {
     }
 }
 
+pub fn has_spl_chars(query:&str) -> bool {
+    let splcheck = Regex::new(r"[\[!@#$%^&*(),.?\]+]").unwrap();
+    if splcheck.is_match(query){
+        true
+    } else {
+        false
+    }
+}
+
 pub fn validate_title(task_name: &str) -> Result<String, Error> {
     let root = getroot();
     let filename = format!("{}/{}.yaml", root, task_name);
@@ -38,5 +47,12 @@ pub fn validate_title(task_name: &str) -> Result<String, Error> {
             "Task with same name already exists",
         ));
     }
+    if has_spl_chars(task_name) {
+        return Err(Error::new(
+            ErrorKind::Other,
+            "Please do not use the following special characters ! @ # $ % ^ & * ( ) , + . ? [ ] in task-name",
+        ));
+    }
+
     Ok(String::from(task_name))
 }

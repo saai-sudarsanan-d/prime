@@ -40,7 +40,7 @@ pub struct CreateArgs {
     /// 2-w -> 2 Weeks | 5-d -> 5 Days | 3-h -> 3 Hours | 10-m -> 10 Minutes | 15-s -> 15 Seconds
     ///
     /// Or a date of the format -> yyyy-mm-dd
-    #[arg(value_name="DEADLINE",default_value_t=("2d").to_string())]
+    #[arg(value_name="DEADLINE",default_value_t=String::from("2-d"))]
     pub deadline: String,
 
     /// Priority of this task (0 <= p < 4)
@@ -66,7 +66,7 @@ pub struct ReadArgs {
     #[arg(
         long = "count",
         short = 'c',
-        value_name = "COUNT",
+        value_name = "MAX COUNT",
         default_value_t = 20
     )]
     pub count: i32,
