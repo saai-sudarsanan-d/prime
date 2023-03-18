@@ -4,7 +4,7 @@ use clap::{ArgAction, Args, Parser, Subcommand};
 #[command(
     author = "Saai Sudarsanan",
     version = "1.0.0",
-    about = "A CLI based Task Driven Workspace"
+    about = "A CLI based To Do App"
 )]
 #[command(propagate_version = true)]
 pub struct PrimeArgs {
@@ -26,7 +26,7 @@ pub enum Mode {
 
 #[derive(Args, Debug)]
 pub struct CreateArgs {
-    /// The task title
+    /// The task title (No Special Characters)
     #[arg(value_name = "TASK NAME")]
     pub task_name: String,
     /// Can be of the form t-x

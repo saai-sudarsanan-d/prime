@@ -1,11 +1,30 @@
 use std::io::{Error, ErrorKind};
 use crate::task::getroot;
 use std::path::Path;
+use std::process;
+// Error Handling
+// Regex Error
+// Invalid Deadline
+// Invalid Priority
+// Task Name Invalid
+// Has Special Chars
 
 use regex::Regex;
 pub fn validate_deadline(deadline: &str) -> Result<&str, Error> {
-    let dl_re = Regex::new(r"^\d{1,3}[\-][wdhms]$").unwrap();
-    let date_re = Regex::new(r"^((18|19|20)[0-9]{2}[\-.](0[13578]|1[02])[\-.](0[1-9]|[12][0-9]|3[01]))|(18|19|20)[0-9]{2}[\-.](0[469]|11)[\-.](0[1-9]|[12][0-9]|30)|(18|19|20)[0-9]{2}[\-.](02)[\-.](0[1-9]|1[0-9]|2[0-8])|(((18|19|20)(04|08|[2468][048]|[13579][26]))|2000)[\-.](02)[\-.]29$").unwrap();
+    let dl_re = match Regex::new(r"^\d{1,3}[\-][wdhms]$") {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("{}",e);
+            process::exit(1);
+        }
+    };
+    let date_re = match Regex::new(r"^((18|19|20)[0-9]{2}[\-.](0[13578]|1[02])[\-.](0[1-9]|[12][0-9]|3[01]))|(18|19|20)[0-9]{2}[\-.](0[469]|11)[\-.](0[1-9]|[12][0-9]|30)|(18|19|20)[0-9]{2}[\-.](02)[\-.](0[1-9]|1[0-9]|2[0-8])|(((18|19|20)(04|08|[2468][048]|[13579][26]))|2000)[\-.](02)[\-.]29$"){
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("{}",e);
+            process::exit(1);
+        }
+    };
     if dl_re.is_match(deadline) {
         Ok("SHORT")
     } else if date_re.is_match(deadline) {
@@ -30,7 +49,13 @@ pub fn validate_priority(priority: u8) -> Result<u8, Error> {
 }
 
 pub fn has_spl_chars(query:&str) -> bool {
-    let splcheck = Regex::new(r"[\[!@#$%^&*(),.?\]+]").unwrap();
+    let splcheck = match Regex::new(r"[\[!@#$%^&*(),.?\]+]") {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("{}",e);
+            process::exit(1);
+        }
+    };
     if splcheck.is_match(query){
         true
     } else {

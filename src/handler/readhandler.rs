@@ -4,15 +4,48 @@ use glob::glob;
 use std::fs;
 use colored::Colorize;
 use regex::Regex;
+use std::process;
 
 pub fn handle(args: ReadArgs){
     let root= getroot();
-    let entries:Vec<_> = glob(&format!("{}/*.yaml",&root)).unwrap().collect();
+    let entries:Vec<_> = match glob(&format!("{}/*.yaml",&root)){
+                Ok(r) => r,
+                Err(e) => {
+                    eprintln!("{}",e);
+                    process::exit(1);
+                }
+            }.collect();
     let mut count = 0;
     for entry in entries{ 
-        let filename = entry.unwrap().to_str().unwrap().to_owned();
-        let task_contents = fs::read_to_string(&filename).unwrap();
-        let task:Task = serde_yaml::from_str(&task_contents).unwrap();
+        let filename = 
+        match 
+            match entry {
+                Ok(r) => r,
+                Err(e) => {
+                    eprintln!("{}",e);
+                    process::exit(1);
+                }
+            }.to_str() 
+        {
+            Some(r) => r,
+            None => continue
+        }.to_owned();
+
+        let task_contents = match fs::read_to_string(&filename) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("{}",e);
+                process::exit(1);
+            }
+        };
+        
+        let task:Task = match serde_yaml::from_str(&task_contents) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("{}",e);
+                process::exit(1);
+            }
+        };
 
         let mut tshow = false;
         let mut dshow = false;
@@ -22,9 +55,18 @@ pub fn handle(args: ReadArgs){
         match &args.task_name { 
             Some(q) => {
                 if has_spl_chars(&q){
-                    panic!("query string cannot contain special characters");
+                    eprintln!("{}",String::from("query string cannot contain special characters").red());
+                    process::exit(1);
                 }
-                let query = Regex::new(&format!(r"{}",q)).unwrap();
+
+                let query = match Regex::new(&format!(r"{}",q)){
+                    Ok(r) => r,
+                    Err(e) => {
+                        eprintln!("{}",e);
+                        process::exit(1);
+                    }
+                };
+                
                 if query.is_match(&task.title) {
                     tshow = true;                
                 }
@@ -36,8 +78,20 @@ pub fn handle(args: ReadArgs){
         // deadline check
         match &args.deadline { 
             Some(d) => {
-                let dl = parsedeadline(d).unwrap();
-                if task.deadline.parse::<DateTime<Local>>().unwrap() < dl {
+                let dl = match parsedeadline(d){
+                    Ok(r) => r,
+                    Err(e) => {
+                        eprintln!("{}",e);
+                        process::exit(1);
+                    }
+                };
+                if match task.deadline.parse::<DateTime<Local>>() {
+                    Ok(r) => r,
+                    Err(e) => {
+                        eprintln!("{}",e);
+                        process::exit(1);
+                    }
+                } < dl {
                     dshow = true;
                 }            
             },
